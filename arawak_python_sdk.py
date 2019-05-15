@@ -15,7 +15,7 @@ class MailSender:
     def __init__(self):
         self.urlEmail = 'https://api.opencaribbean.org/api/v1/mailsender/email/template/'
     
-    def sendEmailTemplate (self, fromAddr, toAddr, template, ccAddr=[], bccAddr=[], subject='', attachments=''):
+    def sendEmailTemplate (self, fromAddr, toAddr, template, body='', ccAddr=[], bccAddr=[], subject='', attachments=[],headers={}):
         """ Function to send a simple email
         
         Args:
@@ -38,10 +38,9 @@ class MailSender:
             >>> sendEmailTemplate(fromAddr,toAddr,template,subject=subject)
             {'content': 'The resource was registered successfully.', 'status_code': 201}
         """
-
         head = {"from": fromAddr, "to": toAddr,"cc": ccAddr, "bcc": bccAddr }
         details = { "attachments": attachments, "subject": subject, "template": template }
-        data = { "details": details, "head": head}    
+        data = { "details": details, "head": head,"headers":headers}    
         return ExecuteQuery().Query(self.urlEmail,'POST',data)
 
 
@@ -952,8 +951,126 @@ class Location:
         Return:
             dict: Response
         Example:
-            >>> placeId = ''
+            >>> placeId = 'EisxMyBNYXJrZXQgU3RyZWV0LCBXaWxtaW5ndG9uLCBOQyAyODQwMSwgVVNB'
             >>> getPlace(placeId)
+            {
+            "addressComponents": [
+                {
+                "longName": "13",
+                "shortName": "13",
+                "types": [
+                    "STREET_NUMBER"
+                ]
+                },
+                {
+                "longName": "Market Street",
+                "shortName": "Market St",
+                "types": [
+                    "ROUTE"
+                ]
+                },
+                {
+                "longName": "Historic District",
+                "shortName": "Historic District",
+                "types": [
+                    "NEIGHBORHOOD",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "Wilmington",
+                "shortName": "Wilmington",
+                "types": [
+                    "LOCALITY",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "Wilmington",
+                "shortName": "Wilmington",
+                "types": [
+                    "ADMINISTRATIVE_AREA_LEVEL_3",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "New Hanover County",
+                "shortName": "New Hanover County",
+                "types": [
+                    "ADMINISTRATIVE_AREA_LEVEL_2",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "North Carolina",
+                "shortName": "NC",
+                "types": [
+                    "ADMINISTRATIVE_AREA_LEVEL_1",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "United States",
+                "shortName": "US",
+                "types": [
+                    "COUNTRY",
+                    "POLITICAL"
+                ]
+                },
+                {
+                "longName": "28401",
+                "shortName": "28401",
+                "types": [
+                    "POSTAL_CODE"
+                ]
+                }
+            ],
+            "adrAddress": "<span class=\"street-address\">13 Market St</span>, <span class=\"locality\">Wilmington</span>, <span class=\"region\">NC</span> <span class=\"postal-code\">28401</span>, <span class=\"country-name\">USA</span>",
+            "formattedAddress": "13 Market St, Wilmington, NC 28401, USA",
+            "formattedPhoneNumber": null,
+            "geometry": {
+                "bounds": null,
+                "location": {
+                "lat": 34.23544330000001,
+                "lng": -77.94935509999999
+                },
+                "locationType": null,
+                "viewport": {
+                "northeast": {
+                    "lat": 34.2367348302915,
+                    "lng": -77.94799896970848
+                },
+                "southwest": {
+                    "lat": 34.2340368697085,
+                    "lng": -77.9506969302915
+                }
+                }
+            },
+            "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/geocode-71.png",
+            "internationalPhoneNumber": null,
+            "name": "13 Market St",
+            "openingHours": null,
+            "photos": null,
+            "placeId": "ChIJgUbEo8cfqokR5lP9_Wh_DaM",
+            "scope": "GOOGLE",
+            "plusCode": {
+                "globalCode": "876463P2+57",
+                "compoundCode": "63P2+57 Wilmington, NC, United States"
+            },
+            "permanentlyClosed": false,
+            "altIds": null,
+            "priceLevel": null,
+            "rating": 0,
+            "reviews": null,
+            "types": [
+                "STREET_ADDRESS"
+            ],
+            "url": "https://maps.google.com/?q=13+Market+St,+Wilmington,+NC+28401,+USA&ftid=0x89aa1fc7a3c44681:0xa30d7f68fdfd53e6",
+            "utcOffset": -240,
+            "vicinity": "Wilmington",
+            "website": null,
+            "htmlAttributions": []
+            }
         """
         url = self.urlMaps + '/places/{0}'.format(placeId)
         return ExecuteQuery().Query(url,'GET')
@@ -1103,6 +1220,7 @@ class ExecuteQuery:
     
     def Query(self,url,typeQuery,data=''):
         jsonData = json.dumps(data)
+        print jsonData
         try:
             if typeQuery == 'POST':
                 request = requests.post(url, headers=self.headers,data=jsonData)
